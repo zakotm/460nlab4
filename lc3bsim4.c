@@ -626,6 +626,7 @@ int SEX(int num, int size){
        }
 }
    int temp;
+   
 void eval_micro_sequencer() {
   /* 
    * Evaluate the address of the next state according to the 
@@ -696,12 +697,12 @@ void cycle_memory()
 	if(cyclecount == 4) /*latching ready bit on 4th cycle*/
 	{
 		NEXT_LATCHES.READY = 1;	
-	if(GetR_W(CURRENT_LATCHES.MICROINSTRUCTION)==0) /*read, 0=byte, 1= word*/
+	if(GetR_W(CURRENT_LATCHES.MICROINSTRUCTION)==0) /*read, 0=byte, 1= word ldw, ldb*/
 			{
 					READMDR = Low16bits((MEMORY[CURRENT_LATCHES.MAR >> 1][1]<<8) + MEMORY[CURRENT_LATCHES.MAR >> 1][0]);
 			}
 			/*If DATA_SIZE is BYTE, MAR[0] determines whether WE1 or WE0 is asserted.*/
-	else if(GetR_W(CURRENT_LATCHES.MICROINSTRUCTION) ==1) /*write*/
+	else if(GetR_W(CURRENT_LATCHES.MICROINSTRUCTION) ==1) /*write stb stw*/
 			{
 				if(GetDATA_SIZE(CURRENT_LATCHES.MICROINSTRUCTION)) /* data.size = 1 = word*/
 				{
@@ -733,6 +734,7 @@ int SR1Temp, SR2Temp, ALUOUT, MARMUXTEMP, SHFTemp, MDROUT;
 int BUSOUT;
 int ADD1,ADD2;
 int A, B;
+int VECTOROUT, VECTORMUXOUT, PSRMUXOUT, SPMUXOUT;
 void eval_bus_drivers() {
  /*values of temporary storage of results of  ADD1MUX, ADD2MUX, SR1, SR2, A and B for ALU*/
   /* 
@@ -895,6 +897,23 @@ ALUOUT = ALUOUT&0xFFFF; /*do i need to sign extend this? */
 	PSRMUXOUT = (GetSET_PRIV(CURRENT_LATCHES.MICROINSTRUCTION)<<15);
 	}
    
+   	switch(GetSPMUX(CURRENT_LATCHES.MICROINSTRUCTION)) 
+	{
+	case 0: 
+	SPMUXOUT = Low16bits(A+2);
+	break;
+	case 1:
+	SPMUXOUT = Low16bits(A-2);
+	break;
+	case 2: 
+	SPMUXOUT= CURRENT_LATCHES.SSP;
+	break;
+	case 3:
+	SPMUXOUT= CURRENT_LATCHES.SAVED_USP;
+	break;
+	default:
+	break;  
+	}
 }
 
 
@@ -928,6 +947,22 @@ void drive_bus() {
    {
 		BUS = SHFTemp;
    }
+   else if(GetGATE_VECTOR(CURRENT_LATCHES.MICROINSTRUCTION))
+   {
+		BUS = Low16bits(0x0200 + (VECTORMUXOUT<<1));
+   }
+   else if(GetGATEPC_2(CURRENT_LATCHES.MICROINSTRUCTION))
+   {
+		BUS = Low16bits(CURRENT_LATCHES.PC - 2);
+   }
+   else if(GetGATEPSR(CURRENT_LATCHES.MICROINSTRUCTION))
+   {
+		BUS = Low16bits(CURRENT_LATCHES.PRIV);
+   }
+   else if(GetGATESP(CURRENT_LATCHES.MICROINSTRUCTION))
+   {
+		BUS= Low16bits(SPMUXOUT);
+   }   
    else
    {
        BUS = 0;
@@ -943,7 +978,14 @@ void latch_datapath_values() {
    * after drive_bus.
    */       
 /*LD.MAR, LD.MDR, LD.IR, LD.BEN, LD.REG, LD.CC, LD.PC*/
-
+if(GetLD_PRIV(CURRENT_LATCHES.MICROINSTRUCTION))
+{
+	NEXT_LATCHES.PRIV = PSRMUXOUT;
+}
+if(GetLD_VECTOR(CURRENT_LATCHES.MICROINSTRUCTION))
+{
+	NEXT_LATCHES.VECTOR = VECTORMUXOUT;
+}
 if(GetLD_MAR(CURRENT_LATCHES.MICROINSTRUCTION))
 {
 	printf("MAR = BUS = %i \n", BUS);
@@ -1023,14 +1065,18 @@ if(GetLD_BEN(CURRENT_LATCHES.MICROINSTRUCTION))
 }
 if(GetLD_REG(CURRENT_LATCHES.MICROINSTRUCTION))
 {
-	/*DR MUX */
-	if(GetDRMUX(CURRENT_LATCHES.MICROINSTRUCTION))
+	/*DR MUX */  /*0 is 11:9, 1 is R7, 2 is R6*/
+	if(GetDRMUX(CURRENT_LATCHES.MICROINSTRUCTION)==1)
 	{
 		NEXT_LATCHES.REGS[7] = BUS;
 	}
 	else if(GetDRMUX(CURRENT_LATCHES.MICROINSTRUCTION)==0)
 	{
 		NEXT_LATCHES.REGS[(CURRENT_LATCHES.IR&0x0E00)>>9] = BUS;
+	}
+	else 
+	{
+		NEXT_LATCHES.REGS[6] = BUS;
 	}
 	
 }

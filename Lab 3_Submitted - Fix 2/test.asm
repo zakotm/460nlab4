@@ -1,0 +1,7 @@
+.ORIG x3000
+ADD R1,R1,#1
+LEA R2,asdf
+STW R1,R2,#0
+HALT
+asdf .FILL x0 
+.END

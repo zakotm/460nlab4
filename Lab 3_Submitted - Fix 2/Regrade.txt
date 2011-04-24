@@ -1,0 +1,99 @@
+=========================================================================
+Part A: Tests for individual states (1.25 points each)
+Each of these compares the result of rdump & mdump after run <n>
+where n is the value in column 3 below
+=========================================================================
+Name of     Instruction      Number of   Number of   Incorrect   Points
+Test Case                    Cycles      Differences
+=========================================================================
+initial                      0           0                 (Not a test case)
+1           ADD R1,R2,R3     1           0                       1.25
+2           ADD R1,R2,R3     6           0                       1.25
+3           ADD R1,R2,R3     7           0                       1.25
+4           ADD R1,R2,R3     8           0                       1.25
+5           ADD R1,R2,R3     9           1              x        0.75
+6imm        ADD R1, R2, x5   9           1              x        0.75
+6ccn        ADD R1, R1, x-5  9           1              x        0.75
+6ccz        ADD R1, R1, x-1  9           2              x        0.25
+7reg        AND R0, R5, R6   9           0                       1.25
+7imm        AND R3, R2, xA   9           2              x        0.25
+8reg        XOR R1, R2, R3   9           1              x        0.75
+8imm        XOR R1, R2, xa   9           1              x        0.75
+8ccn        NOT R1, R1       9           1              x        0.75
+8ccp        NOT R7, R7       9           2              x        0.25
+9           TRAP x25         9           0                       1.25
+10          TRAP x25         14          0                       1.25
+11          TRAP x25         15          0                       1.25
+12          STW R7, R6, #0   9           0                       1.25
+13          STW R7, R6, #0   10          1              x        0.75
+14          STW R7, R6, #0   15          2              x        0.25
+15          STB R7, R6, #0   9           0                       1.25
+16          STB R7, R6, #0   10          0                       1.25
+17          STB R7, R6, #0   15          1              x        0.75
+18          STB R7, R6, #1   9           0                       1.25
+19          STB R7, R6, #1   10          0                       1.25
+20          STB R7, R6, #1   15          1              x        0.75
+21          LDW R0, R6, #0   9           0                       1.25
+22          LDW R0, R6, #0   14          0                       1.25
+23          LDW R0, R6, #0   15          1              x        0.75
+24          LDB R0, R6, #0   9           0                       1.25
+25          LDB R0, R6, #0   14          0                       1.25
+26          LDB R0, R6, #0   15          1              x        0.75
+27          LDB R0, R6, #1   9           0                       1.25
+28          LDB R0, R6, #1   14          0                       1.25
+29          LDB R0, R6, #1   15          2              x        0.25
+30          LEA R2, label    9           0                       1.25
+31          JMP R2           9           0                       1.25
+32          JMP R2           10          0                       1.25
+33          JSRR R2          9           0                       1.25
+34          JSRR R2          10          0                       1.25
+35          JSRR R2          11          0                       1.25
+36          JSR  label       9           0                       1.25
+37          JSR  label       10          1              x        0.75
+38          RET              9           0                       1.25
+39          LSHF R2, R3,#4   9           0                       1.25
+40          RSHFL R2, R6, #4 9           1              x        0.75
+41          RSHFA R2, R6, #4 9           1              x        0.75
+42          BRn label        10          0                       1.25
+
++++Part B
+
+=========================================================================
+Part B: Tests for correct functionality of instructions(2.5 points each)
+=========================================================================
+Instruction     Number of       Incorrect       Points
+                Differences
+=========================================================================
+add             1                  x            2
+and             1                  x            2
+br              2                  x            1.5
+jmp             0                               2.5
+jsr             0                               2.5
+jsrr            1                  x            2
+ldb             x                  x            0
+ldw             x                  x            0
+lea             0                               2.5
+lshf            4                  x            0.5
+rshfa           4                  x            0.5
+rshfl           1                  x            2
+stb             1                  x            2
+stw             x                  x            0
+trap            0                               2.5
+xor             2                  x            1.5
+=========================================================================
+Parts A and B - absolute points: 72 / 100
+Parts A and B - adjusted points: 58 / 80
+=========================================================================
+=========================================================================
+Part C: Microcode (-1 point per error)
+=========================================================================
+Error                   Control Signal  Your Value      Correct Value
+=========================================================================
+
+=========================================================================
+Part C - points: 20 / 20
+=========================================================================
+=========================================================================
+Test Results: Total points 78 / 100 - THIS IS NOT A GRADE
+=========================================================================
+-bash-3.2$

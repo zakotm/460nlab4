@@ -1,0 +1,23 @@
+if(GetLD_MDR(CURRENT_LATCHES.MICROINSTRUCTION)) /*questions about memory, looks like MDROUT*/
+{
+    /*printf("\n MDR %d \n", READMDR); */    
+	if(GetMIO_EN == 0)
+	NEXT_LATCHES.MDR = BUS;
+	else
+	{
+	NEXT_LATCHES.MDR = Low16bits(READMDR);
+	}	
+}
+
+if(GetDATA_SIZE = 1)
+gate value from mdr to bus
+bus = current latches mdr
+else
+	if(CURRENT_LATCHES.MAR&0x0001) 
+	{
+		BUS = Low16bits(SEX(CURRENT_LATCHES.MDR&0xFF00)>>8,8));
+	}
+	else if ((CURRENT_LATCHES.MAR&0x0001) ==0)
+	{
+		BUS = Low16bits(SEX(CURRENT_LATCHES.MDR&0x00FF,8));
+	}

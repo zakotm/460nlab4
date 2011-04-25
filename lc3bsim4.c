@@ -88,6 +88,7 @@ enum CS_BITS {
 	VECTORMUX,
 	PSRMUX,
 	SET_PRIV,
+	EXC,
 /* MODIFY: you have to add all your new control signals */
     CONTROL_STORE_BITS
 } CS_BITS;
@@ -123,9 +124,9 @@ int GetMIO_EN(int *x)        { return(x[MIO_EN]); }
 int GetR_W(int *x)           { return(x[R_W]); }
 int GetDATA_SIZE(int *x)     { return(x[DATA_SIZE]); } 
 int GetLSHF1(int *x)         { return(x[LSHF1]); }
-int GetLD_PRIV(int *x)         { return(x[LD_PRIV]); }
-int GetLD_SAVEDSSP(int *x)	{ return(x[LD_SAVEDSSP]); }
-int GetLD_SAVEDUSP(int *x) 	{ return(x[LD_SAVEDUSP]); }
+int GetLD_PRIV(int *x)       { return(x[LD_PRIV]); }
+int GetLD_SAVEDSSP(int *x)	 { return(x[LD_SAVEDSSP]); }
+int GetLD_SAVEDUSP(int *x)   { return(x[LD_SAVEDUSP]); }
 int GetLD_VECTOR(int *x)           { return(x[LD_VECTOR]); }
 int GetGATE_VECTOR(int *x)           { return(x[GATE_VECTOR]); }
 int GetGATEPC_2(int *x)           { return(x[GATEPC_2]); }
@@ -135,6 +136,7 @@ int GetSPMUX(int *x)           { return((x[SPMUX1]<<1) + x[SPMUX0]); }
 int GetVECTORMUX(int *x)           { return(x[VECTORMUX]); }
 int GetPSRMUX(int *x)           { return(x[PSRMUX]); }
 int GetSET_PRIV(int *x)           { return(x[SET_PRIV]); }
+int GetEXC(int *x)		         { return(x[EXC]); }
 /* MODIFY: you can add more Get functions for your new control signals */
 
 /***************************************************************/

@@ -636,7 +636,8 @@ if(CURRENT_LATCHES.STATE_NUMBER==18) /*checks for state 18, and then if cycle = 
   {
 	if(CYCLE_COUNT == 299)
 	{
-		NEXT_LATCHES.INTV = 0x01;
+		NEXT_LATCHES.INTV = 0x02;
+		NEXT_LATCHES.INT = 1;
 	}
   }
 	if(GetIRD(CURRENT_LATCHES.MICROINSTRUCTION)==1) /*check IRD*/
@@ -668,6 +669,7 @@ if(CURRENT_LATCHES.STATE_NUMBER==18) /*checks for state 18, and then if cycle = 
 		break;
 		case 5: /*check for interrupt list*/
 			temp =  ((temp) | (CURRENT_LATCHES.INT<<4));
+			printf("taking interrupt");
 		break;
 		default:
 			break;
@@ -886,6 +888,7 @@ ALUOUT = ALUOUT&0xFFFF; /*do i need to sign extend this? */
 	{
 		VECTORMUXOUT = CURRENT_LATCHES.INTV;
 		NEXT_LATCHES.INTV = 0;
+		NEXT_LATCHES.INT = 0;
 	}
 	
 	if(GetPSRMUX(CURRENT_LATCHES.MICROINSTRUCTION)) /*PSRMUX/1: individual settings,BUS*/

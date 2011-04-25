@@ -632,18 +632,19 @@ void eval_micro_sequencer() {
    * Evaluate the address of the next state according to the 
    * micro sequencer logic. Latch the next microinstruction.
    */	
-if(CURRENT_LATCHES.STATE_NUMBER==18) /*checks for state 18, and then if cycle = 300, interrupts*/
-  {
+
 	if(CYCLE_COUNT == 299)
 	{
+		printf("reaches 300!!!!!!!!!!!!!!!!!!!!!!");
 		NEXT_LATCHES.INTV = 0x02;
 		NEXT_LATCHES.INT = 1;
 	}
-  }
+ 
 	if(GetIRD(CURRENT_LATCHES.MICROINSTRUCTION)==1) /*check IRD*/
 	{
 		NEXT_LATCHES.STATE_NUMBER= ((CURRENT_LATCHES.IR&0xF000)>>12); /*0,0, IR[15:12] if IRD = 1*/
 		memcpy(NEXT_LATCHES.MICROINSTRUCTION, CONTROL_STORE[((CURRENT_LATCHES.IR&0xF000)>>12)], sizeof(int)*CONTROL_STORE_BITS);
+		printf("int : %i ", CURRENT_LATCHES.INT);
 	}
 	else 
 	{
@@ -675,7 +676,7 @@ if(CURRENT_LATCHES.STATE_NUMBER==18) /*checks for state 18, and then if cycle = 
 			break;
 		}
 		memcpy(NEXT_LATCHES.MICROINSTRUCTION, CONTROL_STORE[temp], sizeof(int)*CONTROL_STORE_BITS);
-		printf("\n next state is going to be %d\n", temp);
+		printf("\n next state is going to be %d\n current register INT = %i \n", temp, CURRENT_LATCHES.INT);
 		NEXT_LATCHES.STATE_NUMBER = temp;
 	}
 
@@ -887,8 +888,6 @@ ALUOUT = ALUOUT&0xFFFF; /*do i need to sign extend this? */
 	else
 	{
 		VECTORMUXOUT = CURRENT_LATCHES.INTV;
-		NEXT_LATCHES.INTV = 0;
-		NEXT_LATCHES.INT = 0;
 	}
 	
 	if(GetPSRMUX(CURRENT_LATCHES.MICROINSTRUCTION)) /*PSRMUX/1: individual settings,BUS*/
@@ -988,11 +987,21 @@ if(GetLD_PRIV(CURRENT_LATCHES.MICROINSTRUCTION))
 if(GetLD_VECTOR(CURRENT_LATCHES.MICROINSTRUCTION))
 {
 	NEXT_LATCHES.VECTOR = VECTORMUXOUT;
+			NEXT_LATCHES.INTV = 0;
+		NEXT_LATCHES.INT = 0;
 }
 if(GetLD_MAR(CURRENT_LATCHES.MICROINSTRUCTION))
 {
 	printf("MAR = BUS = %i \n", BUS);
 	NEXT_LATCHES.MAR = BUS;
+}
+if(GetLD_SAVEDSSP(CURRENT_LATCHES.MICROINSTRUCTION))
+{
+	NEXT_LATCHES.SSP = A;
+}
+if(GetLD_SAVEDUSP(CURRENT_LATCHES.MICROINSTRUCTION))
+{
+	NEXT_LATCHES.SAVED_USP = A;
 }
 
 if(GetLD_MDR(CURRENT_LATCHES.MICROINSTRUCTION)) /*questions about memory, looks like MDROUT*/

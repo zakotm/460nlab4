@@ -88,7 +88,7 @@ enum CS_BITS {
 	VECTORMUX,
 	PSRMUX,
 	SET_PRIV,
-	EXC,
+	LD_EXC,
 /* MODIFY: you have to add all your new control signals */
     CONTROL_STORE_BITS
 } CS_BITS;
@@ -136,7 +136,7 @@ int GetSPMUX(int *x)           { return((x[SPMUX1]<<1) + x[SPMUX0]); }
 int GetVECTORMUX(int *x)           { return(x[VECTORMUX]); }
 int GetPSRMUX(int *x)           { return(x[PSRMUX]); }
 int GetSET_PRIV(int *x)           { return(x[SET_PRIV]); }
-int GetEXC(int *x)		         { return(x[EXC]); }
+int GetLD_EXC(int *x)		         { return(x[LD_EXC]); }
 /* MODIFY: you can add more Get functions for your new control signals */
 
 /***************************************************************/
@@ -197,6 +197,7 @@ int SSP; /* Initial value of system stack pointer */
 int SAVED_USP;
 int PSR;
 int INT; 
+int EXC;
 int VECTOR;
 int PRIV;
 /* MODIFY: You may add system latches that are required by your implementation */
@@ -641,13 +642,34 @@ void eval_micro_sequencer() {
 		NEXT_LATCHES.INTV = 0x02;
 		NEXT_LATCHES.INT = 1;
 	}
- 
+	if(CURRENT_LATCHES.EXC
 	if(GetIRD(CURRENT_LATCHES.MICROINSTRUCTION)==1) /*check IRD*/
 	{
 		NEXT_LATCHES.STATE_NUMBER= ((CURRENT_LATCHES.IR&0xF000)>>12); /*0,0, IR[15:12] if IRD = 1*/
 		memcpy(NEXT_LATCHES.MICROINSTRUCTION, CONTROL_STORE[((CURRENT_LATCHES.IR&0xF000)>>12)], sizeof(int)*CONTROL_STORE_BITS);
 		printf("int : %i ", CURRENT_LATCHES.INT);
 	}
+	/*
+	else if(GetEXC(CURRENT_LATCHES.MICROINSTRUCTION)) 
+	{
+		printf("GET EXC = %i ", GetEXC(CURRENT_LATCHES.MICROINSTRUCTION));
+		if(unprotected)
+		{
+		CURRENT_LATCHES.EXTV = 0x02;
+		NEXT_LATCHES.STATE_NUMBER = 26;
+		}
+		else if(unaligned)
+		{
+		CURRENT_LATCHES.EXTV = 0x03;
+		NEXT_LATCHES.STATE_NUMBER = 26;
+		}
+		else if(unknown)
+		{
+		CURRENT_LATCHES.EXTV = 0x04;
+		NEXT_LATCHES.STATE_NUMBER = 26;
+		}
+		
+	} */
 	else 
 	{
 		temp = GetJ(CURRENT_LATCHES.MICROINSTRUCTION); /* set temp next address to J*/
@@ -989,7 +1011,7 @@ if(GetLD_PRIV(CURRENT_LATCHES.MICROINSTRUCTION))
 if(GetLD_VECTOR(CURRENT_LATCHES.MICROINSTRUCTION))
 {
 	NEXT_LATCHES.VECTOR = VECTORMUXOUT;
-			NEXT_LATCHES.INTV = 0;
+		NEXT_LATCHES.INTV = 0;
 		NEXT_LATCHES.INT = 0;
 }
 if(GetLD_MAR(CURRENT_LATCHES.MICROINSTRUCTION))
